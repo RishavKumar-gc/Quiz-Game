@@ -1,0 +1,116 @@
+#include <iostream>
+#include <string>
+#include <vector>
+#include <algorithm>
+#include <ctime>   
+#include <cstdlib> 
+
+using namespace std;
+struct Question {
+    string question;
+    vector<string> options; 
+    char correctAnswer;   
+    string answer;       
+    string type;           
+};
+void shuffleOptions(vector<string>& options) {
+    random_shuffle(options.begin(), options.end());
+}
+bool askMultipleChoiceQuestion(const Question& q) {
+    char userAnswer;
+    cout << q.question << endl;
+    for (size_t i = 0; i < q.options.size(); ++i) {
+        cout << static_cast<char>('A' + i) << ". " << q.options[i] << endl;
+    }
+    cout << "Your answer (A/B/C/D): ";
+    cin >> userAnswer;
+    userAnswer = toupper(userAnswer); 
+
+    if (userAnswer == q.correctAnswer) {
+        cout << "Correct!" << endl;
+        return true;
+    } else {
+        cout << "Wrong! The correct answer is: " << q.correctAnswer << endl;
+        return false;
+    }
+}
+bool askTrueFalseQuestion(const Question& q) {
+    string userAnswer;
+    cout << q.question << " (True/False): ";
+    cin >> userAnswer;
+    transform(userAnswer.begin(), userAnswer.end(), userAnswer.begin(), ::tolower);
+
+    if ((userAnswer == "true" && q.answer == "True") || (userAnswer == "false" && q.answer == "False")) {
+        cout << "Correct!" << endl;
+        return true;
+    } else {
+        cout << "Wrong! The correct answer is: " << q.answer << endl;
+        return false;
+    }
+}
+bool askQuestionAnswerQuestion(const Question& q) {
+    string userAnswer;
+    cout << q.question << endl;
+    cout << "Your answer: ";
+    cin.ignore(); 
+    getline(cin, userAnswer);
+
+    if (userAnswer == q.answer) {
+        cout << "Correct!" << endl;
+        return true;
+    } else {
+        cout << "Wrong! The correct answer is: " << q.answer << endl;
+        return false;
+    }
+}
+
+int main() {
+    srand(static_cast<unsigned int>(time(0)));
+
+    int score = 0;
+    int totalQuestions = 11;
+    vector<Question> questions = {
+    
+        {"What is the capital of France?", {"Paris", "London", "Berlin", "Madrid"}, 'A', "", "MC"},
+        {"Who wrote 'Harry Potter' series?", {"J.K. Rowling", "Stephen King", "George R.R. Martin", "J.R.R. Tolkien"}, 'A', "", "MC"},
+        {"The Earth is approximately 150 million kilometers away from the Sun.", {}, ' ', "False", "TF"},
+        {"The Great Wall of China is visible from space.", {}, ' ', "False", "TF"},
+        {"What is the powerhouse of the cell?", {}, ' ', "Mitochondria", "QA"},
+        {"Who painted the Mona Lisa?", {}, ' ', "Leonardo da Vinci", "QA"},
+     
+        {"What is 2 + 3 * 4?", {"10", "12", "14", "16"}, 'C', "", "MC"},
+        {"Which planet is known as the Red Planet?", {"Venus", "Mars", "Jupiter", "Saturn"}, 'B', "", "MC"},
+        {"True or False: Water boils at 100 degrees Celsius.", {}, ' ', "True", "TF"},
+        {"Which country hosted the 2016 Summer Olympics?", {"China", "USA", "Brazil", "Germany"}, 'C', "", "MC"},
+        {"Which team has the most chances to win the T20 World Cup 2024?", {"India","Pakistan","South Africa","England"}, 'A', "", "MC"} ,
+        
+    };
+
+    random_shuffle(questions.begin(), questions.end());
+
+    for (const auto& q : questions) {
+        bool correct = false;
+        if (q.type == "MC") {
+            correct = askMultipleChoiceQuestion(q);
+        } else if (q.type == "TF") {
+            correct = askTrueFalseQuestion(q);
+        } else if (q.type == "QA") {
+            correct = askQuestionAnswerQuestion(q);
+        }
+
+        if (correct) {
+            score++;
+        }
+        cout << endl; 
+    }
+    double accuracy = static_cast<double>(score) / totalQuestions * 100.0;
+
+    string passFail = (accuracy >= 60.0) ? "Pass" : "Fail";
+    cout << "Quiz completed!" << endl;
+    cout << "Your score: " << score << " out of " << totalQuestions << endl;
+    cout << "Accuracy level: " << accuracy << "%" << endl;
+    cout << "Result: " << passFail << endl;
+    cout << "Thank you for playing the quiz game!" << endl;
+
+    return 0;
+}
